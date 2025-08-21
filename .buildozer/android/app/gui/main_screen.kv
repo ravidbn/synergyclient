@@ -1,0 +1,260 @@
+#:kivy 2.0.0
+
+<MainScreen>:
+    name: 'main'
+    
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(10)
+        
+        # Header Card
+        MDCard:
+            size_hint_y: None
+            height: dp(80)
+            elevation: 2
+            padding: dp(15)
+            
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: dp(10)
+                
+                MDIcon:
+                    icon: 'bluetooth'
+                    theme_icon_color: 'Primary'
+                    size_hint_x: None
+                    width: dp(40)
+                
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    
+                    MDLabel:
+                        text: 'Synergy Client'
+                        font_style: 'H6'
+                        theme_text_color: 'Primary'
+                        size_hint_y: None
+                        height: dp(30)
+                    
+                    MDLabel:
+                        text: root.connection_info
+                        font_style: 'Caption'
+                        theme_text_color: 'Secondary'
+                        size_hint_y: None
+                        height: dp(20)
+        
+        # Connection Status Card
+        MDCard:
+            size_hint_y: None
+            height: dp(120)
+            elevation: 2
+            padding: dp(15)
+            
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: dp(5)
+                
+                MDLabel:
+                    text: 'Connection Status'
+                    font_style: 'Subtitle1'
+                    theme_text_color: 'Primary'
+                    size_hint_y: None
+                    height: dp(25)
+                
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(15)
+                    
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        
+                        MDIcon:
+                            icon: 'bluetooth' if root.bluetooth_status == 'Connected' else 'bluetooth-off'
+                            theme_icon_color: 'Primary' if root.bluetooth_status == 'Connected' else 'Secondary'
+                            size_hint_y: None
+                            height: dp(30)
+                        
+                        MDLabel:
+                            text: f'Bluetooth: {root.bluetooth_status}'
+                            font_style: 'Body2'
+                            theme_text_color: 'Primary' if root.bluetooth_status == 'Connected' else 'Secondary'
+                            halign: 'center'
+                            size_hint_y: None
+                            height: dp(20)
+                    
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        
+                        MDIcon:
+                            icon: 'wifi' if 'Active' in root.wifi_status else 'wifi-off'
+                            theme_icon_color: 'Primary' if 'Active' in root.wifi_status else 'Secondary'
+                            size_hint_y: None
+                            height: dp(30)
+                        
+                        MDLabel:
+                            text: f'WiFi: {root.wifi_status}'
+                            font_style: 'Body2'
+                            theme_text_color: 'Primary' if 'Active' in root.wifi_status else 'Secondary'
+                            halign: 'center'
+                            size_hint_y: None
+                            height: dp(20)
+        
+        # Connection Controls Card
+        MDCard:
+            size_hint_y: None
+            height: dp(100)
+            elevation: 2
+            padding: dp(15)
+            
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: dp(10)
+                
+                MDRaisedButton:
+                    text: 'Connect' if not root.is_connected else 'Disconnect'
+                    icon: 'bluetooth-connect' if not root.is_connected else 'bluetooth-off'
+                    on_release: root.on_bluetooth_connect() if not root.is_connected else root.on_bluetooth_disconnect()
+                    size_hint_x: 0.5
+                
+                MDRaisedButton:
+                    text: 'WiFi Hotspot'
+                    icon: 'wifi'
+                    on_release: root.on_wifi_toggle()
+                    disabled: not root.is_connected
+                    size_hint_x: 0.5
+        
+        # Color Control Card
+        MDCard:
+            size_hint_y: None
+            height: dp(150)
+            elevation: 2
+            padding: dp(15)
+            
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: dp(10)
+                
+                MDLabel:
+                    text: 'Color Control'
+                    font_style: 'Subtitle1'
+                    theme_text_color: 'Primary'
+                    size_hint_y: None
+                    height: dp(25)
+                
+                MDLabel:
+                    text: 'Send color commands to Windows application'
+                    font_style: 'Caption'
+                    theme_text_color: 'Secondary'
+                    size_hint_y: None
+                    height: dp(20)
+                
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(10)
+                    
+                    MDRaisedButton:
+                        text: 'RED'
+                        md_bg_color: app.theme_cls.accent_color if app.theme_cls.accent_color else (0.8, 0.2, 0.2, 1)
+                        on_release: root.on_color_button('red')
+                        disabled: not root.is_connected
+                    
+                    MDRaisedButton:
+                        text: 'YELLOW'
+                        md_bg_color: (1, 0.8, 0.2, 1)
+                        text_color: (0, 0, 0, 1)
+                        on_release: root.on_color_button('yellow')
+                        disabled: not root.is_connected
+                    
+                    MDRaisedButton:
+                        text: 'GREEN'
+                        md_bg_color: (0.2, 0.8, 0.2, 1)
+                        on_release: root.on_color_button('green')
+                        disabled: not root.is_connected
+        
+        # File Transfer Card
+        MDCard:
+            size_hint_y: None
+            height: dp(200)
+            elevation: 2
+            padding: dp(15)
+            
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: dp(10)
+                
+                MDLabel:
+                    text: 'File Transfer'
+                    font_style: 'Subtitle1'
+                    theme_text_color: 'Primary'
+                    size_hint_y: None
+                    height: dp(25)
+                
+                MDLabel:
+                    text: 'Generate and transfer test files'
+                    font_style: 'Caption'
+                    theme_text_color: 'Secondary'
+                    size_hint_y: None
+                    height: dp(20)
+                
+                MDGridLayout:
+                    cols: 2
+                    spacing: dp(10)
+                    size_hint_y: None
+                    height: dp(80)
+                    
+                    MDRaisedButton:
+                        text: '10MB'
+                        icon: 'file'
+                        on_release: root.on_file_transfer_request('small')
+                        disabled: not root.is_connected
+                    
+                    MDRaisedButton:
+                        text: '25MB'
+                        icon: 'file'
+                        on_release: root.on_file_transfer_request('medium')
+                        disabled: not root.is_connected
+                    
+                    MDRaisedButton:
+                        text: '50MB'
+                        icon: 'file'
+                        on_release: root.on_file_transfer_request('large')
+                        disabled: not root.is_connected
+                    
+                    MDRaisedButton:
+                        text: '100MB'
+                        icon: 'file'
+                        on_release: root.on_file_transfer_request('extra_large')
+                        disabled: not root.is_connected
+                
+                # Transfer Progress
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(5)
+                    size_hint_y: None
+                    height: dp(40)
+                    
+                    MDBoxLayout:
+                        orientation: 'horizontal'
+                        spacing: dp(10)
+                        size_hint_y: None
+                        height: dp(20)
+                        
+                        MDLabel:
+                            text: f'Progress: {root.transfer_progress:.1f}%'
+                            font_style: 'Body2'
+                            theme_text_color: 'Secondary'
+                            size_hint_x: 0.7
+                        
+                        MDLabel:
+                            text: root.transfer_speed
+                            font_style: 'Body2'
+                            theme_text_color: 'Secondary'
+                            halign: 'right'
+                            size_hint_x: 0.3
+                    
+                    MDProgressBar:
+                        value: root.transfer_progress
+                        size_hint_y: None
+                        height: dp(4)
+        
+        # Spacer to push everything up
+        Widget:

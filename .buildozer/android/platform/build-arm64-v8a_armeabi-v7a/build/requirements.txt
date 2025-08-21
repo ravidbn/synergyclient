@@ -1,0 +1,7 @@
+certifi
+chardet
+idna
+kivymd
+plyer
+requests
+urllib3

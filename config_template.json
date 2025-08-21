@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "Synergy Demo System Configuration",
+  "description": "Configuration template for Android and Windows applications",
+  "type": "object",
+  "properties": {
+    "application": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "Synergy Demo",
+          "description": "Application display name"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "default": "1.0.0",
+          "description": "Application version in semantic versioning format"
+        },
+        "environment": {
+          "type": "string",
+          "enum": ["development", "staging", "production"],
+          "default": "development",
+          "description": "Deployment environment"
+        },
+        "debug_mode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable debug logging and developer features"
+        }
+      },
+      "required": ["name", "version", "environment"]
+    },
+    "bluetooth": {
+      "type": "object",
+      "properties": {
+        "service_uuid": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "default": "00001101-0000-1000-8000-00805f9b34fb",
+          "description": "Bluetooth service UUID for RFCOMM communication"
+        },
+        "device_name": {
+          "type": "string",
+          "default": "Synergy Android",
+          "description": "Bluetooth device name for discovery"
+        },
+        "scan_timeout_ms": {
+          "type": "integer",
+          "minimum": 5000,
+          "maximum": 120000,
+          "default": 30000,
+          "description": "Device scanning timeout in milliseconds"
+        },
+        "connection_timeout_ms": {
+          "type": "integer",
+          "minimum": 5000,
+          "maximum": 60000,
+          "default": 15000,
+          "description": "Connection establishment timeout in milliseconds"
+        },
+        "auto_reconnect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically reconnect on connection loss"
+        },
+        "max_reconnect_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 3,
+          "description": "Maximum number of reconnection attempts"
+        },
+        "reconnect_delay_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 30000,
+          "default": 5000,
+          "description": "Delay between reconnection attempts in milliseconds"
+        }
+      },
+      "required": ["service_uuid", "device_name"]
+    },
+    "wifi": {
+      "type": "object",
+      "properties": {
+        "hotspot_ssid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "default": "SynergyDemo",
+          "description": "Wi-Fi hotspot SSID"
+        },
+        "hotspot_password": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 63,
+          "default": "SynergyDemo2024",
+          "description": "Wi-Fi hotspot password (WPA2/WPA3)"
+        },
+        "hotspot_channel": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 14,
+          "default": 6,
+          "description": "Wi-Fi channel for hotspot (2.4GHz band)"
+        },
+        "hotspot_max_clients": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 5,
+          "description": "Maximum number of connected clients"
+        },
+        "ip_address": {
+          "type": "string",
+          "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+          "default": "192.168.43.1",
+          "description": "Hotspot gateway IP address"
+        },
+        "subnet_mask": {
+          "type": "string",
+          "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+          "default": "255.255.255.0",
+          "description": "Subnet mask for hotspot network"
+        },
+        "dhcp_range_start": {
+          "type": "string",
+          "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+          "default": "192.168.43.100",
+          "description": "DHCP range start address"
+        },
+        "dhcp_range_end": {
+          "type": "string",
+          "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+          "default": "192.168.43.200",
+          "description": "DHCP range end address"
+        }
+      },
+      "required": ["hotspot_ssid", "hotspot_password", "ip_address"]
+    },
+    "file_transfer": {
+      "type": "object",
+      "properties": {
+        "server_port": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 65535,
+          "default": 8888,
+          "description": "TCP server port for file transfers"
+        },
+        "chunk_size": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1048576,
+          "default": 65536,
+          "description": "File transfer chunk size in bytes"
+        },
+        "max_file_size_mb": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 100,
+          "description": "Maximum file size for transfers in MB"
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 5000,
+          "maximum": 300000,
+          "default": 60000,
+          "description": "File transfer timeout in milliseconds"
+        },
+        "enable_compression": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable data compression during transfer"
+        },
+        "verify_checksums": {
+          "type": "boolean",
+          "default": true,
+          "description": "Verify file integrity using SHA256 checksums"
+        },
+        "max_concurrent_transfers": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 3,
+          "description": "Maximum number of concurrent file transfers"
+        },
+        "temp_directory": {
+          "type": "string",
+          "default": "/tmp/synergy_transfers",
+          "description": "Temporary directory for file transfers"
+        }
+      },
+      "required": ["server_port", "chunk_size"]
+    },
+    "ui": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark", "auto"],
+          "default": "auto",
+          "description": "UI theme preference"
+        },
+        "color_primary": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "default": "#2196F3",
+          "description": "Primary theme color (Android Material Design)"
+        },
+        "color_accent": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "default": "#FF4081",
+          "description": "Accent theme color"
+        },
+        "animation_duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 2000,
+          "default": 300,
+          "description": "UI animation duration in milliseconds"
+        },
+        "show_advanced_options": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show advanced configuration options in UI"
+        },
+        "auto_start_services": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start services on app launch"
+        }
+      }
+    },
+    "logging": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+          "default": "INFO",
+          "description": "Logging level"
+        },
+        "enable_file_logging": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable logging to files"
+        },
+        "log_directory": {
+          "type": "string",
+          "default": "logs",
+          "description": "Directory for log files (relative to app data)"
+        },
+        "max_log_size_mb": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10,
+          "description": "Maximum log file size in MB before rotation"
+        },
+        "max_log_files": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 5,
+          "description": "Maximum number of log files to keep"
+        },
+        "enable_remote_logging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable remote logging to centralized server"
+        },
+        "remote_logging_endpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Remote logging endpoint URL"
+        }
+      },
+      "required": ["level"]
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "encryption_enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable data encryption for sensitive communications"
+        },
+        "certificate_validation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate SSL/TLS certificates"
+        },
+        "allowed_devices": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|\\*$"
+          },
+          "default": ["*"],
+          "description": "Allowed Bluetooth device MAC addresses (* for all)"
+        },
+        "allowed_ip_ranges": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/\\d{1,2}$"
+          },
+          "default": ["192.168.0.0/16", "10.0.0.0/8"],
+          "description": "Allowed IP address ranges for connections"
+        },
+        "session_timeout_minutes": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 480,
+          "default": 60,
+          "description": "Session timeout in minutes"
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "enable_performance_monitoring": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable performance metrics collection"
+        },
+        "memory_warning_threshold_mb": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 2000,
+          "default": 512,
+          "description": "Memory usage warning threshold in MB"
+        },
+        "cpu_usage_warning_threshold": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 1.0,
+          "default": 0.8,
+          "description": "CPU usage warning threshold (0.0 to 1.0)"
+        },
+        "max_concurrent_operations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 5,
+          "description": "Maximum number of concurrent operations"
+        },
+        "enable_resource_cleanup": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic resource cleanup"
+        }
+      }
+    },
+    "demo": {
+      "type": "object",
+      "properties": {
+        "auto_generate_files": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically generate demo files on startup"
+        },
+        "demo_file_sizes_mb": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "default": [10, 25, 50, 100],
+          "description": "Available demo file sizes in MB"
+        },
+        "auto_start_demo": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically start demo sequence on device pairing"
+        },
+        "demo_sequence_delay_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 10000,
+          "default": 3000,
+          "description": "Delay between demo sequence steps in milliseconds"
+        },
+        "loop_demo": {
+          "type": "boolean",
+          "default": false,
+          "description": "Loop demo sequence continuously"
+        }
+      }
+    }
+  },
+  "required": ["application", "bluetooth", "wifi", "file_transfer"],
+  "additionalProperties": false
+}
