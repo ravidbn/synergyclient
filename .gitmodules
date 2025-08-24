@@ -1,6 +1,6 @@
-#[submodule ".buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/dav1d"]
-#    path = .buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/dav1d
-#    url = https://github.com/videolan/dav1d.git
-#[submodule ".buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/jpeg"]
-#    path = .buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/jpeg
-#    url = https://github.com/some-repo/jpeg.git
+[submodule ".buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/dav1d"]
+    path = .buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/dav1d
+    url = https://github.com/videolan/dav1d.git
+[submodule ".buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/jpeg"]
+    path = .buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/jpeg
+    url = https://github.com/libsdl-org/jpeg.git
