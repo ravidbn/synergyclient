@@ -1,0 +1,3 @@
+[submodule ".buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/dav1d"]
+    path = .buildozer/android/platform/build-arm64-v8a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/dav1d
+    url = https://github.com/videolan/dav1d.git
