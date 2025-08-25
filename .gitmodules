@@ -57,3 +57,35 @@
 	path = .buildozer/android/platform/build-arm64-v8a/dists/synergyclient/jni/SDL2_image/external/dav1d
 	url = https://github.com/libsdl-org/dav1d.git
 	branch = 1.2.1-SDL
+[submodule "external/jpeg"]
+	path = .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/jpeg
+	url = https://github.com/libsdl-org/jpeg.git
+	branch = v9e-SDL
+[submodule "external/libpng"]
+	path = .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/libpng
+	url = https://github.com/libsdl-org/libpng.git
+	branch = v1.6.40-SDL
+[submodule "external/libwebp"]
+	path = .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/libwebp
+	url = https://github.com/libsdl-org/libwebp.git
+	branch = 1.0.3-SDL
+[submodule "external/libtiff"]
+	path = .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/libtiff
+	url = https://github.com/libsdl-org/libtiff.git
+	branch = v4.2.0-SDL
+[submodule "external/zlib"]
+	path = .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/zlib
+	url = https://github.com/libsdl-org/zlib.git
+	branch = v1.3-SDL
+[submodule "external/libjxl"]
+	path = .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/libjxl
+	url = https://github.com/libsdl-org/libjxl.git
+	branch = v0.6.1-SDL
+[submodule "external/libavif"]
+	path = .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/libavif
+	url = https://github.com/libsdl-org/libavif.git
+	branch = v1.0.2-SDL
+[submodule "external/dav1d"]
+	path = .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/bootstrap_builds/sdl2/jni/SDL2_image/external/dav1d
+	url = https://github.com/libsdl-org/dav1d.git
+	branch = 1.2.1-SDL
