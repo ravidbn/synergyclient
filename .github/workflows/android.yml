@@ -35,10 +35,10 @@ jobs:
       run: |
         export CLASSPATH=$CLASSPATH:$(pwd)/jaxb-api-2.3.1.jar:$(pwd)/jaxb-impl-2.3.1.jar:$(pwd)/jaxb-core-2.3.0.1.jar:$(pwd)/jaxb-runtime-2.3.1.jar
         
-    - name: Set up JDK 17
+    - name: Set up JDK 8
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
+        java-version: '8'
         distribution: 'temurin'
 
     - name: Set up Android SDK
