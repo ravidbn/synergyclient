@@ -21,9 +21,9 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-8-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
-        sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
-        sudo update-alternatives --set javac /usr/lib/jvm/java-8-openjdk-amd64/bin/javac
+        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
+        sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/jre/bin/java
+        sudo update-alternatives --set javac /usr/lib/jvm/java-17-openjdk-amd64/bin/javac
         java -version
     - name: Download JAXB dependencies
       run: |
@@ -35,10 +35,10 @@ jobs:
       run: |
         export CLASSPATH=$CLASSPATH:$(pwd)/jaxb-api-2.3.1.jar:$(pwd)/jaxb-impl-2.3.1.jar:$(pwd)/jaxb-core-2.3.0.1.jar:$(pwd)/jaxb-runtime-2.3.1.jar
         
-    - name: Set up JDK 8
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
+        java-version: '17'
         distribution: 'temurin'
 
     - name: Set up Android SDK
