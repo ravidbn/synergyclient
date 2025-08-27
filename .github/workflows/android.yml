@@ -22,18 +22,19 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
+        sudo apt-get install -y libjaxb-api-java
         sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-17-openjdk-amd64/bin/java 1
         sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-17-openjdk-amd64/bin/javac 1
         java -version
-    - name: Download JAXB dependencies
-      run: |
-        wget https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar
-        wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar
-        wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-core-2.3.0.1.jar
-        wget https://repo1.maven.org/maven2/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar
-    - name: Set CLASSPATH for Java tools
-      run: |
-        export CLASSPATH=$CLASSPATH:$(pwd)/jaxb-api-2.3.1.jar:$(pwd)/jaxb-impl-2.3.1.jar:$(pwd)/jaxb-core-2.3.0.1.jar:$(pwd)/jaxb-runtime-2.3.1.jar
+#    - name: Download JAXB dependencies
+#      run: |
+#        wget https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar
+#        wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar
+#        wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-core-2.3.0.1.jar
+#        wget https://repo1.maven.org/maven2/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar
+#    - name: Set CLASSPATH for Java tools
+#      run: |
+#        export CLASSPATH=$CLASSPATH:$(pwd)/jaxb-api-2.3.1.jar:$(pwd)/jaxb-impl-2.3.1.jar:$(pwd)/jaxb-core-2.3.0.1.jar:$(pwd)/jaxb-runtime-2.3.1.jar
         
     - name: Set up JDK 17
       uses: actions/setup-java@v3
