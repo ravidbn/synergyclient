@@ -33,7 +33,7 @@ jobs:
         wget https://repo1.maven.org/maven2/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar
     - name: Set CLASSPATH for Java tools
       run: |
-        export CLASSPATH=$CLASSPATH:$(pwd)/jaxb-api-2.3.1.jar:$(pwd)/jaxb-impl-2.3.1.jar:$(pwd)/jaxb-core-2.3.1.jar:$(pwd)/jaxb-runtime-2.3.1.jar
+        export CLASSPATH=$CLASSPATH:$(pwd)/jaxb-api-2.3.1.jar:$(pwd)/jaxb-impl-2.3.1.jar:$(pwd)/jaxb-core-2.3.0.1.jar:$(pwd)/jaxb-runtime-2.3.1.jar
         
     - name: Set up JDK 17
       uses: actions/setup-java@v3
