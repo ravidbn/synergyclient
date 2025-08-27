@@ -29,7 +29,7 @@ jobs:
       run: |
         wget https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar
         wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar
-        wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-core/2.3.1/jaxb-core-2.3.1.jar
+        wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-core-2.3.0.1.jar
         wget https://repo1.maven.org/maven2/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar
     - name: Set CLASSPATH for Java tools
       run: |
