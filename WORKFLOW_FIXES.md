@@ -8,7 +8,8 @@
 **Fix:** Updated both files to include:
 - `kivymd` - Required for Material Design UI components
 - `requests` - For HTTP requests
-- `pybluez` - For Bluetooth functionality
+
+**Note:** Initially included `pybluez`, but removed due to compatibility issues with modern Python/setuptools versions. Android Bluetooth functionality uses Java APIs through PyJNIus instead.
 
 ### 2. JDK Version Management ✅
 **Problem:** Complex Java version requirements:
@@ -69,15 +70,16 @@
 - Added fallback for `libtinfo5` package (Ubuntu 22.04+ compatibility)
 
 ### `buildozer.spec`
-- Added missing requirements: `kivymd,requests,pybluez`
+- Added missing requirements: `kivymd,requests`
 
 ### `requirements.txt`
 - Added missing dependencies:
   ```
   kivymd
   requests
-  pybluez
   ```
+
+**Note:** Removed `pybluez` due to `use_2to3 is invalid` error with modern setuptools. Android Bluetooth uses Java APIs.
 
 ### `.gitignore` (New)
 - Prevents build artifacts from being committed
