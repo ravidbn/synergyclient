@@ -16,7 +16,8 @@ echo "🔍 Checking system dependencies..."
 # Install system dependencies
 echo "📦 Installing system dependencies..."
 sudo apt-get update
-sudo apt-get install -y git zip unzip openjdk-8-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
+sudo apt-get install -y git zip unzip openjdk-8-jdk python3-pip autoconf automake libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
+sudo apt-get install -y build-essential m4 gettext
 
 # Try to install libtinfo5, fallback to libtinfo6 if not available
 sudo apt-get install -y libtinfo5 || sudo apt-get install -y libtinfo6

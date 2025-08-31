@@ -47,6 +47,7 @@
 - Added `dpkg --add-architecture i386` to enable 32-bit packages
 - Made 32-bit packages optional (modern builds often don't need them)
 - Added fallback for `libtinfo5` → `libtinfo6` compatibility
+- Added missing autotools: `automake`, `m4`, `gettext`, `build-essential`
 - Graceful degradation if packages are unavailable
 
 ### 6. Build Process Improvements ✅
@@ -62,6 +63,7 @@
 ### `.github/workflows/android.yml`
 - Implemented dual Java version management (Java 17 for SDK, Java 8 for buildozer)
 - Fixed Android SDK license acceptance with proper Java version
+- Added complete build toolchain: autotools, automake, m4, gettext, build-essential
 - Added robust system dependency installation with Ubuntu 22.04+ compatibility
 - Enabled i386 architecture for 32-bit packages
 - Made 32-bit packages optional for modern build compatibility
