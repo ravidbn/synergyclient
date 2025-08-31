@@ -34,14 +34,15 @@
 - Created comprehensive .gitignore file to prevent build artifacts from being committed
 
 ### 5. System Dependencies ✅
-**Problem:** Missing 32-bit libraries required for Android build tools.
+**Problem:** Missing 32-bit libraries required for Android build tools, and `libtinfo5` package not available in newer Ubuntu versions.
 
 **Fix:** Added missing dependencies:
 - `libc6:i386`
-- `libncurses5:i386` 
+- `libncurses5:i386`
 - `libstdc++6:i386`
 - `lib32z1`
 - `libbz2-1.0:i386`
+- Added fallback for `libtinfo5` → `libtinfo6` compatibility
 
 ### 6. Build Process Improvements ✅
 **Problem:** Build process lacked proper dependency installation and verbose output.
@@ -56,9 +57,10 @@
 ### `.github/workflows/android.yml`
 - Fixed JDK version (17 → 8)
 - Fixed Android SDK license acceptance
-- Added missing system dependencies
+- Added missing system dependencies with Ubuntu version compatibility
 - Improved build process with verbose output
 - Added cleanup steps to prevent submodule issues
+- Added fallback for `libtinfo5` package (Ubuntu 22.04+ compatibility)
 
 ### `buildozer.spec`
 - Added missing requirements: `kivymd,requests,pybluez`

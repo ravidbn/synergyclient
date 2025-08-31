@@ -16,8 +16,10 @@ echo "🔍 Checking system dependencies..."
 # Install system dependencies
 echo "📦 Installing system dependencies..."
 sudo apt-get update
-sudo apt-get install -y git zip unzip openjdk-8-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+sudo apt-get install -y git zip unzip openjdk-8-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
 sudo apt-get install -y libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 libbz2-1.0:i386
+# Try to install libtinfo5, fallback to libtinfo6 if not available
+sudo apt-get install -y libtinfo5 || sudo apt-get install -y libtinfo6
 
 echo "☕ Setting up Java environment..."
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
