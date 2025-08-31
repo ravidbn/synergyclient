@@ -15,17 +15,23 @@ from kivy.clock import Clock
 from kivy.logger import Logger
 from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 
-# KivyMD imports
-from kivymd.app import MDApp
-from kivymd.uix.screen import MDScreen
-from kivymd.uix.screenmanager import MDScreenManager
-from kivymd.uix.button import MDRaisedButton, MDFlatButton
-from kivymd.uix.card import MDCard
-from kivymd.uix.label import MDLabel
-from kivymd.uix.progressbar import MDProgressBar
-from kivymd.uix.dialog import MDDialog
-from kivymd.uix.snackbar import Snackbar
-from kivymd.uix.list import OneLineListItem
+# KivyMD imports - temporarily commented out for basic build
+# from kivymd.app import MDApp
+# from kivymd.uix.screen import MDScreen
+# from kivymd.uix.screenmanager import MDScreenManager
+# from kivymd.uix.button import MDRaisedButton, MDFlatButton
+# from kivymd.uix.card import MDCard
+# from kivymd.uix.label import MDLabel
+# from kivymd.uix.progressbar import MDProgressBar
+# from kivymd.uix.dialog import MDDialog
+# from kivymd.uix.snackbar import Snackbar
+# from kivymd.uix.list import OneLineListItem
+
+# Use basic Kivy widgets instead
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 
 # Service imports
 from bluetooth_service import BluetoothService
@@ -42,7 +48,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class MainScreen(MDScreen):
+class MainScreen(Screen):
     """Main screen of the application."""
     
     # Properties for data binding
@@ -104,7 +110,7 @@ class MainScreen(MDScreen):
         self.transfer_speed = speed
 
 
-class SynergyClientApp(MDApp):
+class SynergyClientApp(App):
     """Main application class."""
     
     def __init__(self, **kwargs):
@@ -133,7 +139,7 @@ class SynergyClientApp(MDApp):
     def build(self):
         """Build the application UI."""
         # Create screen manager
-        sm = MDScreenManager()
+        sm = ScreenManager()
         
         # Create main screen
         self.main_screen = MainScreen(name='main')
@@ -152,8 +158,9 @@ class SynergyClientApp(MDApp):
         # Initialize services
         self._initialize_services()
         
-        # Show welcome message
-        Snackbar(text="Synergy Client started. Tap 'Connect' to begin.").open()
+        # Show welcome message - using basic popup instead of Snackbar
+        popup = Popup(title='Welcome', content=Label(text='Synergy Client started'), size_hint=(0.6, 0.3))
+        popup.open()
     
     def _initialize_services(self):
         """Initialize all services."""
@@ -201,26 +208,15 @@ class SynergyClientApp(MDApp):
             self._show_error_dialog("No Devices", "No paired Bluetooth devices found")
             return
         
-        # Create device list items
-        device_items = []
-        for device in self.available_devices:
-            item = OneLineListItem(
-                text=f"{device['name']} ({device['address']})",
-                on_release=lambda x, dev=device: self._connect_to_device(dev)
-            )
-            device_items.append(item)
+        # Create device list - simplified for basic Kivy
+        device_text = "\n".join([f"{device['name']} ({device['address']})" for device in self.available_devices])
         
-        # Show dialog
-        self.device_dialog = MDDialog(
+        # Show simple popup instead of MDDialog
+        content = Label(text=device_text)
+        self.device_dialog = Popup(
             title="Select Bluetooth Device",
-            type="simple",
-            items=device_items,
-            buttons=[
-                MDFlatButton(
-                    text="CANCEL",
-                    on_release=lambda x: self.device_dialog.dismiss()
-                )
-            ]
+            content=content,
+            size_hint=(0.8, 0.6)
         )
         self.device_dialog.open()
     
@@ -292,20 +288,23 @@ class SynergyClientApp(MDApp):
         self.wifi_service.stop_hotspot()
         self.file_service.stop_file_server()
         
-        Snackbar(text="Disconnected").open()
+        popup = Popup(title='Status', content=Label(text='Disconnected'), size_hint=(0.5, 0.3))
+        popup.open()
     
     def toggle_wifi_hotspot(self):
         """Toggle WiFi hotspot on/off."""
         if self.wifi_service.is_hotspot_active():
             self.wifi_service.stop_hotspot()
-            Snackbar(text="WiFi hotspot stopped").open()
+            popup = Popup(title='WiFi', content=Label(text='WiFi hotspot stopped'), size_hint=(0.6, 0.3))
+            popup.open()
         else:
             self._start_wifi_hotspot()
     
     def send_color_command(self, color_name):
         """Send color change command via Bluetooth."""
         if not self.bluetooth_service.is_connected():
-            Snackbar(text="Not connected to any device").open()
+            popup = Popup(title='Error', content=Label(text='Not connected to any device'), size_hint=(0.6, 0.3))
+            popup.open()
             return
         
         # Convert color name to ColorType
@@ -319,14 +318,17 @@ class SynergyClientApp(MDApp):
         if color:
             success = self.bluetooth_service.send_color_command(color)
             if success:
-                Snackbar(text=f"Sent {color_name.title()} command").open()
+                popup = Popup(title='Success', content=Label(text=f'Sent {color_name.title()} command'), size_hint=(0.6, 0.3))
+                popup.open()
             else:
-                Snackbar(text="Failed to send command").open()
+                popup = Popup(title='Error', content=Label(text='Failed to send command'), size_hint=(0.6, 0.3))
+                popup.open()
     
     def request_file_transfer(self, size_preset):
         """Request file transfer with specified size."""
         if not self.bluetooth_service.is_connected():
-            Snackbar(text="Not connected to any device").open()
+            popup = Popup(title='Error', content=Label(text='Not connected to any device'), size_hint=(0.6, 0.3))
+            popup.open()
             return
         
         size_mb = PRESET_FILE_SIZES.get(size_preset, 25)
@@ -339,9 +341,11 @@ class SynergyClientApp(MDApp):
         )
         
         if success:
-            Snackbar(text=f"Requesting {size_mb}MB file transfer...").open()
+            popup = Popup(title='Transfer', content=Label(text=f'Requesting {size_mb}MB file transfer...'), size_hint=(0.7, 0.3))
+            popup.open()
         else:
-            Snackbar(text="Failed to send transfer request").open()
+            popup = Popup(title='Error', content=Label(text='Failed to send transfer request'), size_hint=(0.6, 0.3))
+            popup.open()
     
     def _on_wifi_connection_status(self, message):
         """Handle WiFi connection status message."""
@@ -349,7 +353,7 @@ class SynergyClientApp(MDApp):
         if data.get('connected'):
             logger.info("Windows device connected to WiFi hotspot")
             Clock.schedule_once(
-                lambda dt: Snackbar(text="Windows device connected to WiFi").open()
+                lambda dt: Popup(title='WiFi', content=Label(text='Windows device connected to WiFi'), size_hint=(0.7, 0.3)).open()
             )
     
     def _on_file_transfer_request(self, message):
@@ -361,7 +365,7 @@ class SynergyClientApp(MDApp):
         self.bluetooth_service.send_file_transfer_response(True, 8888)
         
         Clock.schedule_once(
-            lambda dt: Snackbar(text=f"Receiving {file_size_mb:.1f}MB file...").open()
+            lambda dt: Popup(title='Transfer', content=Label(text=f'Receiving {file_size_mb:.1f}MB file...'), size_hint=(0.7, 0.3)).open()
         )
     
     def _on_color_change_ack(self, message):
@@ -370,7 +374,7 @@ class SynergyClientApp(MDApp):
         if data.get('success'):
             color = data.get('current_color', 'Unknown')
             Clock.schedule_once(
-                lambda dt: Snackbar(text=f"Color changed to {color}").open()
+                lambda dt: Popup(title='Color', content=Label(text=f'Color changed to {color}'), size_hint=(0.6, 0.3)).open()
             )
     
     def _on_transfer_progress(self, progress_info):
@@ -391,8 +395,10 @@ class SynergyClientApp(MDApp):
             time_ms = result.get('transfer_time_ms', 0)
             
             Clock.schedule_once(
-                lambda dt: Snackbar(
-                    text=f"Transfer complete! {speed:.1f} Mbps in {time_ms/1000:.1f}s"
+                lambda dt: Popup(
+                    title='Transfer Complete',
+                    content=Label(text=f'Transfer complete! {speed:.1f} Mbps in {time_ms/1000:.1f}s'),
+                    size_hint=(0.8, 0.4)
                 ).open()
             )
         else:
