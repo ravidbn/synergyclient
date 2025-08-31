@@ -22,6 +22,9 @@ jobs:
       with:
         command: buildozer android debug
         buildozer_version: master
+      env:
+        ANDROID_API_LEVEL: 34
+        ANDROID_BUILD_TOOLS_VERSION: 34.0.0
         
     - name: Upload APK
       uses: actions/upload-artifact@v4

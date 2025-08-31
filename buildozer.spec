@@ -91,26 +91,26 @@ fullscreen = 0
 #icon.adaptive_foreground.filename = %(source.dir)s/data/icon_fg.png
 #icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png
 
-# (list) Permissions
-android.permissions = BLUETOOTH,BLUETOOTH_ADMIN,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION,ACCESS_WIFI_STATE,CHANGE_WIFI_STATE,ACCESS_NETWORK_STATE,CHANGE_NETWORK_STATE,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE,INTERNET,CHANGE_WIFI_MULTICAST_STATE,ACCESS_BACKGROUND_LOCATION
+# (list) Permissions - Updated for Android 12+ (API 31+)
+android.permissions = BLUETOOTH,BLUETOOTH_ADMIN,BLUETOOTH_CONNECT,BLUETOOTH_ADVERTISE,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION,ACCESS_WIFI_STATE,CHANGE_WIFI_STATE,ACCESS_NETWORK_STATE,CHANGE_NETWORK_STATE,READ_EXTERNAL_STORAGE,INTERNET,CHANGE_WIFI_MULTICAST_STATE,ACCESS_BACKGROUND_LOCATION,NEARBY_WIFI_DEVICES
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-android.api = 30
+android.api = 34
 
 # (int) Minimum API your APK / AAB will support.
-android.minapi = 21
+android.minapi = 26
 
 # (int) Android SDK version to use
-android.sdk = 30
+android.sdk = 34
 
 # (str) Android NDK version to use
 android.ndk = 25b
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
-android.ndk_api = 21
+android.ndk_api = 26
 
 # (bool) Use --private data storage (True) or --dir public storage (False)
 android.private_storage = True
