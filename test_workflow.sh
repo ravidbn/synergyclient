@@ -28,9 +28,13 @@ sudo apt-get update || true
 sudo apt-get install -y libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 libbz2-1.0:i386 || echo "⚠️  Warning: Some 32-bit packages not available, continuing without them"
 
 echo "☕ Setting up Java environment..."
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+# Install both Java 8 and 17
+sudo apt-get install -y openjdk-17-jdk
+
+echo "Using Java 17 for Android SDK setup..."
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 export PATH=$JAVA_HOME/bin:$PATH
-echo "Java version:"
+echo "Java 17 version:"
 java -version
 
 echo "🐍 Setting up Python environment..."
@@ -64,7 +68,13 @@ echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/androi
 echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
 echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license-old"
 
-echo "🚀 Starting Android build..."
+echo "🔄 Switching to Java 8 for buildozer..."
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+echo "Java 8 version for buildozer:"
+java -version
+
+echo "� Starting Android build..."
 echo "This may take 20-40 minutes for the first build..."
 
 export ANDROID_SDK_ROOT=$ANDROID_HOME

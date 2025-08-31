@@ -10,13 +10,16 @@
 - `requests` - For HTTP requests
 - `pybluez` - For Bluetooth functionality
 
-### 2. JDK Version Conflicts ✅
-**Problem:** Workflow was using JDK 17, but Buildozer typically requires JDK 8 for Android builds to avoid compatibility issues.
+### 2. JDK Version Management ✅
+**Problem:** Complex Java version requirements:
+- Android SDK tools (sdkmanager) require Java 17+ (class file version 61.0)
+- Buildozer typically works better with Java 8
+- `UnsupportedClassVersionError` when trying to run modern SDK tools with Java 8
 
-**Fix:** 
-- Changed from JDK 17 to JDK 8 in the workflow
-- Added proper JAVA_HOME environment variable setup
-- Removed unnecessary JDK 17 setup step
+**Fix:** Implemented dual Java version strategy:
+- Use Java 17 for Android SDK setup and license acceptance
+- Switch to Java 8 for the actual buildozer build process
+- Proper JAVA_HOME switching between versions
 
 ### 3. Android SDK License Issues ✅
 **Problem:** The SDK license acceptance command was using an incorrect path and method.
@@ -56,8 +59,8 @@
 ## Updated Files
 
 ### `.github/workflows/android.yml`
-- Fixed JDK version (17 → 8)
-- Fixed Android SDK license acceptance
+- Implemented dual Java version management (Java 17 for SDK, Java 8 for buildozer)
+- Fixed Android SDK license acceptance with proper Java version
 - Added robust system dependency installation with Ubuntu 22.04+ compatibility
 - Enabled i386 architecture for 32-bit packages
 - Made 32-bit packages optional for modern build compatibility
@@ -124,10 +127,11 @@ buildozer android debug --verbose
 ## Troubleshooting
 
 If build still fails, check the Actions logs for:
-1. **Java version issues** - Ensure JDK 8 is being used
+1. **Java version issues** - Ensure Java 17 is used for SDK setup, Java 8 for buildozer
 2. **Missing dependencies** - Verify all pip packages install successfully
 3. **SDK/NDK download failures** - Network connectivity issues
 4. **Permission errors** - Should be resolved with our fixes
+5. **UnsupportedClassVersionError** - Indicates wrong Java version for specific tools
 
 ## Next Steps
 1. Commit and push all changes to trigger the workflow

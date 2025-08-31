@@ -31,17 +31,11 @@ jobs:
         sudo apt-get update || true
         sudo apt-get install -y libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 libbz2-1.0:i386 || echo "Warning: Some 32-bit packages not available, continuing without them"
         
-    - name: Set up JDK 8 for Buildozer
+    - name: Set up JDK 17 for Android SDK
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
+        java-version: '17'
         distribution: 'temurin'
-    
-    - name: Set Java environment
-      run: |
-        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
-        echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
-        java -version
 
     - name: Set up Android SDK
       uses: android-actions/setup-android@v2
@@ -55,6 +49,18 @@ jobs:
         echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
         echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
         echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license-old"
+        
+    - name: Set up JDK 8 for Buildozer
+      uses: actions/setup-java@v3
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+    
+    - name: Set Java 8 environment for Buildozer
+      run: |
+        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+        echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
+        java -version
         
     - name: Install buildozer and dependencies
       run: |
