@@ -21,26 +21,20 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
-        sudo apt-get install -y libjaxb-api-java
-        sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-17-openjdk-amd64/bin/java 1
-        sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-17-openjdk-amd64/bin/javac 1
-        java -version
-#    - name: Download JAXB dependencies
-#      run: |
-#        wget https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar
-#        wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar
-#        wget https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-core-2.3.0.1.jar
-#        wget https://repo1.maven.org/maven2/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar
-#    - name: Set CLASSPATH for Java tools
-#      run: |
-#        export CLASSPATH=$CLASSPATH:$(pwd)/jaxb-api-2.3.1.jar:$(pwd)/jaxb-impl-2.3.1.jar:$(pwd)/jaxb-core-2.3.0.1.jar:$(pwd)/jaxb-runtime-2.3.1.jar
+        sudo apt-get install -y git zip unzip openjdk-8-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+        sudo apt-get install -y libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 libbz2-1.0:i386
         
-    - name: Set up JDK 17
+    - name: Set up JDK 8 for Buildozer
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
+        java-version: '8'
         distribution: 'temurin'
+    
+    - name: Set Java environment
+      run: |
+        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+        echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
+        java -version
 
     - name: Set up Android SDK
       uses: android-actions/setup-android@v2
@@ -50,21 +44,27 @@ jobs:
         
     - name: Accept Android licenses
       run: |
-        echo y | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
+        mkdir -p "$ANDROID_HOME/licenses"
+        echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+        echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+        echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license-old"
         
-    - name: Install buildozer
+    - name: Install buildozer and dependencies
       run: |
         python -m pip install --upgrade pip
         pip install buildozer cython==0.29.33
-    - name: Init submodules
+        pip install -r requirements.txt
+    
+    - name: Clean buildozer cache (prevent submodule issues)
       run: |
-        git submodule sync
-        git submodule update --init --recursive
-
+        rm -rf .buildozer
+        rm -rf .gitmodules
+    
     - name: Build APK
       run: |
         export ANDROID_SDK_ROOT=$ANDROID_HOME
-        buildozer android debug
+        export ANDROID_HOME=$ANDROID_HOME
+        buildozer android debug --verbose
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
