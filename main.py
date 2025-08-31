@@ -33,12 +33,44 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 
-# Service imports
-from bluetooth_service import BluetoothService
-from wifi_hotspot_service import WiFiHotspotService
-from file_transfer_service import FileTransferService
-from utils.protocol import ColorType, ActionType, MessageType
-from utils.file_generator import PRESET_FILE_SIZES, FileGenerator
+# Service imports - using mock versions for initial testing
+try:
+    # Try to import Android-specific services
+    from bluetooth_service import BluetoothService
+    from wifi_hotspot_service import WiFiHotspotService
+    from file_transfer_service import FileTransferService
+    USING_MOCKS = False
+except ImportError:
+    # Fall back to mock services if Android imports fail
+    from bluetooth_service_mock import BluetoothService
+    from wifi_hotspot_service_mock import WiFiHotspotService
+    from file_transfer_service_mock import FileTransferService
+    USING_MOCKS = True
+
+# Protocol imports with fallbacks
+try:
+    from utils.protocol import ColorType, ActionType, MessageType
+except ImportError:
+    # Create minimal mock enums if protocol import fails
+    class ColorType:
+        RED = "red"
+        YELLOW = "yellow"
+        GREEN = "green"
+    
+    class ActionType:
+        WIFI_CONNECTION_STATUS = "wifi_connection_status"
+        FILE_TRANSFER_REQUEST = "file_transfer_request"
+        COLOR_CHANGE_ACK = "color_change_ack"
+    
+    class MessageType:
+        COMMAND = "command"
+
+# File generator with fallback
+try:
+    from utils.file_generator import PRESET_FILE_SIZES, FileGenerator
+except ImportError:
+    PRESET_FILE_SIZES = {"small": 1, "medium": 25, "large": 100}
+    FileGenerator = None
 
 # Configure logging
 logging.basicConfig(
@@ -116,8 +148,9 @@ class SynergyClientApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.title = "Synergy Client"
-        self.theme_cls.primary_palette = "Blue"
-        self.theme_cls.theme_style = "Light"
+        # Note: theme_cls is only available in MDApp, not basic Kivy App
+        # self.theme_cls.primary_palette = "Blue"
+        # self.theme_cls.theme_style = "Light"
         
         # Services
         self.bluetooth_service = BluetoothService()
@@ -153,14 +186,29 @@ class SynergyClientApp(App):
     
     def on_start(self):
         """Called when the app starts."""
+        print("=== SYNERGY CLIENT STARTING ===")
         logger.info("Synergy Client started")
         
-        # Initialize services
-        self._initialize_services()
-        
-        # Show welcome message - using basic popup instead of Snackbar
-        popup = Popup(title='Welcome', content=Label(text='Synergy Client started'), size_hint=(0.6, 0.3))
-        popup.open()
+        try:
+            print(f"Using mock services: {USING_MOCKS}")
+            
+            # Initialize services
+            print("Initializing services...")
+            self._initialize_services()
+            print("Services initialized successfully")
+            
+            # Show welcome message - using basic popup instead of Snackbar
+            startup_text = f"Synergy Client started\nUsing mock services: {USING_MOCKS}"
+            popup = Popup(title='Welcome', content=Label(text=startup_text), size_hint=(0.6, 0.4))
+            popup.open()
+            
+            print("=== STARTUP COMPLETE ===")
+            
+        except Exception as e:
+            print(f"ERROR in on_start: {str(e)}")
+            logger.error(f"Error in on_start: {str(e)}")
+            error_popup = Popup(title='Startup Error', content=Label(text=f'Error: {str(e)}'), size_hint=(0.8, 0.5))
+            error_popup.open()
     
     def _initialize_services(self):
         """Initialize all services."""
