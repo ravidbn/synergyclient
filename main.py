@@ -29,6 +29,8 @@ try:
     # Android classes for keeping app active
     PythonActivity = autoclass('org.kivy.android.PythonActivity')
     WindowManager = autoclass('android.view.WindowManager')
+    Context = autoclass('android.content.Context')
+    PowerManager = autoclass('android.os.PowerManager')
     
     ANDROID_AVAILABLE = True
     print("Android APIs available for foreground control")
@@ -147,6 +149,7 @@ class SynergyClientApp(App):
         self.available_devices = []
         self.current_transfer = None
         self.keep_alive_event = None
+        self.wake_lock = None
         
         # Setup service callbacks
         self._setup_service_callbacks()
@@ -529,6 +532,11 @@ class SynergyClientApp(App):
         if self.keep_alive_event:
             self.keep_alive_event.cancel()
         
+        # Release wake lock
+        if self.wake_lock and self.wake_lock.isHeld():
+            self.wake_lock.release()
+            print("WakeLock released")
+        
         # Cleanup services
         self.bluetooth_service.cleanup()
         self.wifi_service.cleanup()
@@ -543,6 +551,15 @@ class SynergyClientApp(App):
                 
                 # Keep screen on
                 activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                
+                # Acquire wake lock to prevent backgrounding
+                power_manager = activity.getSystemService(Context.POWER_SERVICE)
+                self.wake_lock = power_manager.newWakeLock(
+                    PowerManager.PARTIAL_WAKE_LOCK,
+                    "SynergyClient::KeepAwake"
+                )
+                self.wake_lock.acquire()
+                print("WakeLock acquired")
                 
                 # Try to keep app in foreground
                 activity.moveTaskToFront(activity.getTaskId(), 0)
