@@ -49,6 +49,15 @@ PRESET_FILE_SIZES = {
     "xlarge": 100
 }
 
+# Phase 3: Carefully add single mock service
+try:
+    from bluetooth_service_mock import BluetoothService
+    BLUETOOTH_SERVICE_AVAILABLE = True
+    print("SUCCESS: Bluetooth mock service imported")
+except ImportError as e:
+    BLUETOOTH_SERVICE_AVAILABLE = False
+    print(f"FALLBACK: Bluetooth service import failed ({e})")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -68,6 +77,15 @@ class SynergyClientApp(App):
         self.current_color = ColorType.RED
         self.demo_devices = ["Device_1", "Device_2", "Windows_PC"]
         self.colors = [ColorType.RED, ColorType.YELLOW, ColorType.GREEN]
+        
+        # Phase 3: Initialize Bluetooth service if available
+        self.bluetooth_service = None
+        if BLUETOOTH_SERVICE_AVAILABLE:
+            try:
+                self.bluetooth_service = BluetoothService()
+                print("Bluetooth mock service initialized")
+            except Exception as e:
+                print(f"Bluetooth service initialization error: {e}")
     
     def build(self):
         """Build stable UI with SynergyClient branding."""
@@ -143,13 +161,26 @@ class SynergyClientApp(App):
             return Label(text=f'Error: {str(e)}')
     
     def on_demo_bluetooth(self, instance):
-        """Demo Bluetooth functionality with protocol integration."""
-        print("Demo: Bluetooth scan with protocol")
-        Logger.info("Application: Demo Bluetooth scan with protocol")
-        self.button_count += 1
-        device_name = self.demo_devices[self.button_count % len(self.demo_devices)]
-        instance.text = f"Connected: {device_name}"
-        print(f"Protocol: Connected to {device_name}")
+        """Demo Bluetooth functionality with real mock service."""
+        print("Demo: Bluetooth scan with mock service")
+        Logger.info("Application: Demo Bluetooth scan with mock service")
+        
+        if self.bluetooth_service and BLUETOOTH_SERVICE_AVAILABLE:
+            try:
+                # Use real mock service
+                devices = self.bluetooth_service.scan_for_devices()
+                self.button_count += 1
+                instance.text = f"Mock Service: {len(devices)} devices"
+                print(f"Mock Bluetooth service found {len(devices)} devices: {devices}")
+            except Exception as e:
+                instance.text = f"Service error: {e}"
+                print(f"Mock service error: {e}")
+        else:
+            # Fallback to simulation
+            self.button_count += 1
+            device_name = self.demo_devices[self.button_count % len(self.demo_devices)]
+            instance.text = f"Simulated: {device_name}"
+            print(f"Simulated connection to {device_name}")
     
     def on_demo_wifi(self, instance):
         """Demo WiFi functionality with protocol integration."""
