@@ -22,6 +22,20 @@ from kivy.uix.progressbar import ProgressBar
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 
+# Android-specific imports to prevent backgrounding
+try:
+    from jnius import autoclass
+    
+    # Android classes for keeping app active
+    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+    WindowManager = autoclass('android.view.WindowManager')
+    
+    ANDROID_AVAILABLE = True
+    print("Android APIs available for foreground control")
+except ImportError:
+    ANDROID_AVAILABLE = False
+    print("Android APIs not available - running in desktop mode")
+
 # Service imports - using mock versions for initial testing
 try:
     # Try to import Android-specific services
@@ -132,6 +146,7 @@ class SynergyClientApp(App):
         # State
         self.available_devices = []
         self.current_transfer = None
+        self.keep_alive_event = None
         
         # Setup service callbacks
         self._setup_service_callbacks()
@@ -164,6 +179,13 @@ class SynergyClientApp(App):
         welcome_message = f"Synergy Client started with {service_status}. Tap 'Connect' to begin."
         self._show_popup("Welcome", welcome_message)
         print(f"App started successfully with {service_status}")
+        
+        # Prevent app from going to background
+        self.prevent_backgrounding()
+        
+        # Keep app active with periodic updates
+        self.keep_alive_event = Clock.schedule_interval(self.keep_alive, 2.0)
+        print("Keep-alive timer started")
     
     def _initialize_services(self):
         """Initialize all services."""
@@ -501,11 +523,50 @@ class SynergyClientApp(App):
     def on_stop(self):
         """Called when the app stops."""
         logger.info("Synergy Client stopping")
+        print("=== APP STOPPING ===")
+        
+        # Clean up keep-alive timer
+        if self.keep_alive_event:
+            self.keep_alive_event.cancel()
         
         # Cleanup services
         self.bluetooth_service.cleanup()
         self.wifi_service.cleanup()
         self.file_service.cleanup()
+    
+    def prevent_backgrounding(self):
+        """Prevent app from automatically going to background."""
+        if ANDROID_AVAILABLE:
+            try:
+                print("Setting up Android foreground behavior...")
+                activity = PythonActivity.mActivity
+                
+                # Keep screen on
+                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                
+                # Try to keep app in foreground
+                activity.moveTaskToFront(activity.getTaskId(), 0)
+                
+                print("Android foreground setup complete")
+                
+            except Exception as e:
+                print(f"Android setup error: {e}")
+        else:
+            print("Android APIs not available - skipping foreground setup")
+    
+    def keep_alive(self, dt):
+        """Keep app alive and prevent backgrounding."""
+        print("Keep-alive tick...")
+        
+        if ANDROID_AVAILABLE:
+            try:
+                # Keep bringing app to foreground
+                activity = PythonActivity.mActivity
+                activity.moveTaskToFront(activity.getTaskId(), 0)
+            except Exception as e:
+                print(f"Keep-alive error: {e}")
+        
+        return True  # Continue scheduling
 
 
 # Main entry point
