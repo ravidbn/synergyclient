@@ -97,14 +97,14 @@ jobs:
         buildozer android debug --verbose
         
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: synergy-client-apk
         path: bin/*.apk
       if: always()
         
     - name: Upload build logs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-logs
         path: .buildozer/
