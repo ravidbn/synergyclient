@@ -31,6 +31,24 @@ except ImportError:
     ANDROID_AVAILABLE = False
     print("Android APIs not available - running in desktop mode")
 
+# Lightweight protocol definitions - safe additions
+class ColorType:
+    RED = "red"
+    YELLOW = "yellow"
+    GREEN = "green"
+
+class ActionType:
+    COLOR_CHANGE = "color_change"
+    WIFI_CONNECTION_STATUS = "wifi_status"
+    FILE_TRANSFER_REQUEST = "file_transfer_request"
+
+PRESET_FILE_SIZES = {
+    "small": 10,
+    "medium": 25,
+    "large": 50,
+    "xlarge": 100
+}
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,6 +65,9 @@ class SynergyClientApp(App):
         self.wake_lock = None
         self.title = "Synergy Client"
         self.button_count = 0
+        self.current_color = ColorType.RED
+        self.demo_devices = ["Device_1", "Device_2", "Windows_PC"]
+        self.colors = [ColorType.RED, ColorType.YELLOW, ColorType.GREEN]
     
     def build(self):
         """Build stable UI with SynergyClient branding."""
@@ -122,30 +143,49 @@ class SynergyClientApp(App):
             return Label(text=f'Error: {str(e)}')
     
     def on_demo_bluetooth(self, instance):
-        """Demo Bluetooth functionality without heavy imports."""
-        print("Demo: Bluetooth scan simulation")
-        Logger.info("Application: Demo Bluetooth scan")
+        """Demo Bluetooth functionality with protocol integration."""
+        print("Demo: Bluetooth scan with protocol")
+        Logger.info("Application: Demo Bluetooth scan with protocol")
         self.button_count += 1
-        instance.text = f"Found 2 mock devices (Demo #{self.button_count})"
-        print("Simulated Bluetooth scan - found mock devices")
+        device_name = self.demo_devices[self.button_count % len(self.demo_devices)]
+        instance.text = f"Connected: {device_name}"
+        print(f"Protocol: Connected to {device_name}")
     
     def on_demo_wifi(self, instance):
-        """Demo WiFi functionality without heavy imports."""
-        print("Demo: WiFi hotspot simulation")
-        Logger.info("Application: Demo WiFi hotspot")
+        """Demo WiFi functionality with protocol integration."""
+        print("Demo: WiFi hotspot with protocol")
+        Logger.info("Application: Demo WiFi hotspot with protocol")
         self.button_count += 1
-        instance.text = f"Hotspot: SynergyDemo_{self.button_count}"
-        print("Simulated WiFi hotspot creation")
+        ssid = f"SynergyHotspot_{self.button_count}"
+        
+        # Simulate protocol message
+        wifi_message = {
+            "action": ActionType.WIFI_CONNECTION_STATUS,
+            "ssid": ssid,
+            "status": "active"
+        }
+        
+        instance.text = f"Active: {ssid}"
+        print(f"Protocol message: {wifi_message}")
     
     def on_demo_color(self, instance):
-        """Demo color command without heavy imports."""
-        print("Demo: Color command simulation")
-        Logger.info("Application: Demo color command")
-        colors = ['Red', 'Yellow', 'Green']
-        color = colors[self.button_count % 3]
+        """Demo color command with protocol integration."""
+        print("Demo: Color command with protocol")
+        Logger.info("Application: Demo color command with protocol")
+        
+        # Use protocol definitions
+        self.current_color = self.colors[self.button_count % len(self.colors)]
         self.button_count += 1
-        instance.text = f"Sent: {color} command"
-        print(f"Simulated {color} color command")
+        
+        # Simulate protocol message
+        color_message = {
+            "action": ActionType.COLOR_CHANGE,
+            "color": self.current_color,
+            "timestamp": self.button_count
+        }
+        
+        instance.text = f"Protocol: {self.current_color.title()}"
+        print(f"Sent protocol message: {color_message}")
     
     def on_start(self):
         """Called when app starts."""
