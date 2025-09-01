@@ -31,21 +31,67 @@ except ImportError:
     ANDROID_AVAILABLE = False
     print("Android APIs not available - running in desktop mode")
 
+# Service imports - using mock versions for stability
+try:
+    # Try to import Android-specific services
+    from bluetooth_service import BluetoothService
+    from wifi_hotspot_service import WiFiHotspotService
+    from file_transfer_service import FileTransferService
+    USING_MOCKS = False
+    print("SUCCESS: Using real Android services")
+except ImportError as e:
+    # Fall back to mock services if Android imports fail
+    print(f"FALLBACK: Android services failed ({e}), using mock services")
+    from bluetooth_service_mock import BluetoothService
+    from wifi_hotspot_service_mock import WiFiHotspotService
+    from file_transfer_service_mock import FileTransferService
+    USING_MOCKS = True
+
+try:
+    from utils.protocol import ColorType, ActionType, MessageType
+    from utils.file_generator import PRESET_FILE_SIZES, FileGenerator
+except ImportError as e:
+    print(f"Protocol imports failed: {e} - creating minimal alternatives")
+    # Create minimal alternatives for missing imports
+    class ColorType:
+        RED = "red"
+        YELLOW = "yellow"
+        GREEN = "green"
+    
+    PRESET_FILE_SIZES = {"small": 10, "medium": 25, "large": 50}
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-print("=== MINIMAL SYNERGY CLIENT STARTING ===")
-Logger.info("Application: Minimal Synergy Client starting")
+print("=== SYNERGY CLIENT STARTING ===")
+Logger.info("Application: Synergy Client starting")
 
-class MinimalApp(App):
-    """Minimal application for testing."""
+class SynergyClientApp(App):
+    """SynergyClient application with stable foreground handling."""
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.keep_alive_event = None
         self.wake_lock = None
         self.title = "Synergy Client"
+        
+        # Initialize services with error handling
+        self.bluetooth_service = None
+        self.wifi_service = None
+        self.file_service = None
+        self.available_devices = []
+        self._init_services()
+    
+    def _init_services(self):
+        """Initialize services with error handling."""
+        try:
+            self.bluetooth_service = BluetoothService()
+            self.wifi_service = WiFiHotspotService()
+            self.file_service = FileTransferService()
+            print("Services initialized successfully")
+        except Exception as e:
+            print(f"Service initialization error: {e}")
     
     def build(self):
         """Build minimal UI."""
@@ -53,12 +99,12 @@ class MinimalApp(App):
             print("Building minimal UI...")
             Logger.info("Application: Building UI")
             
-            # Create simple layout
+            # Create main layout
             layout = BoxLayout(orientation='vertical', padding=20, spacing=10)
             
             # Add title
             title = Label(
-                text='Synergy Client - Minimal Version\nShould stay in foreground!',
+                text='Synergy Client\nStays in foreground!',
                 size_hint_y=None,
                 height=80,
                 text_size=(None, None)
@@ -67,26 +113,62 @@ class MinimalApp(App):
             
             # Add status
             android_status = "Android APIs Available" if ANDROID_AVAILABLE else "Desktop Mode"
+            service_status = "Mock Services" if USING_MOCKS else "Real Services"
             status = Label(
-                text=f'App started successfully!\n{android_status}\nNo complex services loaded.',
+                text=f'Status: {android_status}\nServices: {service_status}\nReady for Bluetooth pairing',
                 size_hint_y=None,
-                height=120,
+                height=100,
                 text_size=(None, None)
             )
             layout.add_widget(status)
             
-            # Add test button
-            button = Button(
-                text='Test Button - Tap Me!',
+            # Add Bluetooth button
+            bt_button = Button(
+                text='Scan & Connect Bluetooth',
                 size_hint_y=None,
                 height=60
             )
-            button.bind(on_press=self.on_button_press)
-            layout.add_widget(button)
+            bt_button.bind(on_press=self.on_bluetooth_scan)
+            layout.add_widget(bt_button)
+            
+            # Add WiFi button
+            wifi_button = Button(
+                text='Create WiFi Hotspot',
+                size_hint_y=None,
+                height=60
+            )
+            wifi_button.bind(on_press=self.on_wifi_hotspot)
+            layout.add_widget(wifi_button)
+            
+            # Add color control buttons
+            color_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=60, spacing=10)
+            
+            red_btn = Button(text='Red')
+            red_btn.bind(on_press=lambda x: self.send_color_command('red'))
+            color_layout.add_widget(red_btn)
+            
+            yellow_btn = Button(text='Yellow')
+            yellow_btn.bind(on_press=lambda x: self.send_color_command('yellow'))
+            color_layout.add_widget(yellow_btn)
+            
+            green_btn = Button(text='Green')
+            green_btn.bind(on_press=lambda x: self.send_color_command('green'))
+            color_layout.add_widget(green_btn)
+            
+            layout.add_widget(color_layout)
+            
+            # Add file transfer button
+            file_button = Button(
+                text='Request File Transfer (25MB)',
+                size_hint_y=None,
+                height=60
+            )
+            file_button.bind(on_press=self.on_file_transfer)
+            layout.add_widget(file_button)
             
             # Add info
             info = Label(
-                text='If you see this UI and can tap the button,\nthe basic app is working correctly.\nNext step: add back features gradually.',
+                text='All buttons functional with mock services.\nUses stable foreground handling.',
                 text_size=(None, None)
             )
             layout.add_widget(info)
@@ -102,16 +184,84 @@ class MinimalApp(App):
             # Emergency fallback
             return Label(text=f'Error: {str(e)}')
     
-    def on_button_press(self, instance):
-        """Handle button press."""
-        print("Button pressed!")
-        Logger.info("Application: Button pressed")
-        instance.text = "Button Pressed! ✓ App is working!"
+    def on_bluetooth_scan(self, instance):
+        """Handle Bluetooth scan and connect."""
+        print("Bluetooth scan requested!")
+        Logger.info("Application: Bluetooth scan")
+        
+        if self.bluetooth_service:
+            try:
+                devices = self.bluetooth_service.scan_for_devices()
+                instance.text = f"Found {len(devices)} devices"
+                print(f"Bluetooth scan found {len(devices)} devices")
+            except Exception as e:
+                instance.text = f"Scan error: {e}"
+                print(f"Bluetooth scan error: {e}")
+        else:
+            instance.text = "Bluetooth service not available"
+    
+    def on_wifi_hotspot(self, instance):
+        """Handle WiFi hotspot creation."""
+        print("WiFi hotspot requested!")
+        Logger.info("Application: WiFi hotspot")
+        
+        if self.wifi_service:
+            try:
+                result = self.wifi_service.create_hotspot()
+                if result.get('success'):
+                    instance.text = f"Hotspot: {result.get('ssid', 'Created')}"
+                    print(f"WiFi hotspot created: {result}")
+                else:
+                    instance.text = "Hotspot failed"
+                    print(f"WiFi hotspot failed: {result}")
+            except Exception as e:
+                instance.text = f"WiFi error: {e}"
+                print(f"WiFi error: {e}")
+        else:
+            instance.text = "WiFi service not available"
+    
+    def send_color_command(self, color):
+        """Send color command."""
+        print(f"Color command: {color}")
+        Logger.info(f"Application: Color command {color}")
+        
+        if self.bluetooth_service:
+            try:
+                success = self.bluetooth_service.send_color_command(getattr(ColorType, color.upper(), color))
+                print(f"Color command {color} sent: {success}")
+            except Exception as e:
+                print(f"Color command error: {e}")
+        else:
+            print("Bluetooth service not available for color command")
+    
+    def on_file_transfer(self, instance):
+        """Handle file transfer request."""
+        print("File transfer requested!")
+        Logger.info("Application: File transfer")
+        
+        if self.bluetooth_service and self.file_service:
+            try:
+                size_mb = PRESET_FILE_SIZES.get("medium", 25)
+                success = self.bluetooth_service.send_file_transfer_request(
+                    size_mb * 1024 * 1024,
+                    f"test_file_{size_mb}MB.bin",
+                    "android_to_windows"
+                )
+                instance.text = f"Transfer request: {success}"
+                print(f"File transfer request sent: {success}")
+            except Exception as e:
+                instance.text = f"Transfer error: {e}"
+                print(f"File transfer error: {e}")
+        else:
+            instance.text = "Services not available"
     
     def on_start(self):
         """Called when app starts."""
-        print("=== APP STARTED SUCCESSFULLY ===")
-        Logger.info("Application: Started successfully")
+        print("=== SYNERGY CLIENT STARTED SUCCESSFULLY ===")
+        Logger.info("Application: Synergy Client started successfully")
+        
+        # Initialize service callbacks if available
+        self._setup_service_callbacks()
         
         # Prevent app from going to background
         self.prevent_backgrounding()
@@ -120,6 +270,15 @@ class MinimalApp(App):
         self.keep_alive_event = Clock.schedule_interval(self.keep_alive, 2.0)
         
         print("Keep-alive timer started")
+    
+    def _setup_service_callbacks(self):
+        """Setup service callbacks with error handling."""
+        try:
+            if self.bluetooth_service and hasattr(self.bluetooth_service, 'start_server'):
+                self.bluetooth_service.start_server("SynergyClient")
+                print("Bluetooth server started")
+        except Exception as e:
+            print(f"Service callback setup error: {e}")
     
     def prevent_backgrounding(self):
         """Prevent app from automatically going to background."""
@@ -181,9 +340,9 @@ class MinimalApp(App):
 # Main entry point
 if __name__ == '__main__':
     try:
-        print("Creating minimal app...")
-        app = MinimalApp()
-        print("Running app...")
+        print("Creating Synergy Client app...")
+        app = SynergyClientApp()
+        print("Running Synergy Client...")
         app.run()
     except Exception as e:
         print(f"FATAL ERROR: {str(e)}")
