@@ -49,7 +49,7 @@ PRESET_FILE_SIZES = {
     "xlarge": 100
 }
 
-# Phase 3: Carefully add single mock service
+# Phase 4: Add remaining mock services incrementally
 try:
     from bluetooth_service_mock import BluetoothService
     BLUETOOTH_SERVICE_AVAILABLE = True
@@ -57,6 +57,22 @@ try:
 except ImportError as e:
     BLUETOOTH_SERVICE_AVAILABLE = False
     print(f"FALLBACK: Bluetooth service import failed ({e})")
+
+try:
+    from wifi_hotspot_service_mock import WiFiHotspotService
+    WIFI_SERVICE_AVAILABLE = True
+    print("SUCCESS: WiFi mock service imported")
+except ImportError as e:
+    WIFI_SERVICE_AVAILABLE = False
+    print(f"FALLBACK: WiFi service import failed ({e})")
+
+try:
+    from file_transfer_service_mock import FileTransferService
+    FILE_SERVICE_AVAILABLE = True
+    print("SUCCESS: File transfer mock service imported")
+except ImportError as e:
+    FILE_SERVICE_AVAILABLE = False
+    print(f"FALLBACK: File transfer service import failed ({e})")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -78,14 +94,31 @@ class SynergyClientApp(App):
         self.demo_devices = ["Device_1", "Device_2", "Windows_PC"]
         self.colors = [ColorType.RED, ColorType.YELLOW, ColorType.GREEN]
         
-        # Phase 3: Initialize Bluetooth service if available
+        # Phase 4: Initialize all mock services if available
         self.bluetooth_service = None
+        self.wifi_service = None
+        self.file_service = None
+        
         if BLUETOOTH_SERVICE_AVAILABLE:
             try:
                 self.bluetooth_service = BluetoothService()
                 print("Bluetooth mock service initialized")
             except Exception as e:
                 print(f"Bluetooth service initialization error: {e}")
+        
+        if WIFI_SERVICE_AVAILABLE:
+            try:
+                self.wifi_service = WiFiHotspotService()
+                print("WiFi mock service initialized")
+            except Exception as e:
+                print(f"WiFi service initialization error: {e}")
+        
+        if FILE_SERVICE_AVAILABLE:
+            try:
+                self.file_service = FileTransferService()
+                print("File transfer mock service initialized")
+            except Exception as e:
+                print(f"File service initialization error: {e}")
     
     def build(self):
         """Build stable UI with SynergyClient branding."""
@@ -142,9 +175,18 @@ class SynergyClientApp(App):
             color_button.bind(on_press=self.on_demo_color)
             layout.add_widget(color_button)
             
+            # Add file transfer button
+            file_button = Button(
+                text='Demo: File Transfer (25MB)',
+                size_hint_y=None,
+                height=60
+            )
+            file_button.bind(on_press=self.on_demo_file_transfer)
+            layout.add_widget(file_button)
+            
             # Add info
             info = Label(
-                text='Demo buttons show SynergyClient functionality.\nStable foundation ready for real service integration.\nForces foreground operation - no backgrounding.',
+                text='All SynergyClient functions with mock services.\nStable foreground operation maintained.\nReady for cross-platform testing.',
                 text_size=(None, None)
             )
             layout.add_widget(info)
@@ -183,21 +225,26 @@ class SynergyClientApp(App):
             print(f"Simulated connection to {device_name}")
     
     def on_demo_wifi(self, instance):
-        """Demo WiFi functionality with protocol integration."""
-        print("Demo: WiFi hotspot with protocol")
-        Logger.info("Application: Demo WiFi hotspot with protocol")
-        self.button_count += 1
-        ssid = f"SynergyHotspot_{self.button_count}"
+        """Demo WiFi functionality with real mock service."""
+        print("Demo: WiFi hotspot with mock service")
+        Logger.info("Application: Demo WiFi hotspot with mock service")
         
-        # Simulate protocol message
-        wifi_message = {
-            "action": ActionType.WIFI_CONNECTION_STATUS,
-            "ssid": ssid,
-            "status": "active"
-        }
-        
-        instance.text = f"Active: {ssid}"
-        print(f"Protocol message: {wifi_message}")
+        if self.wifi_service and WIFI_SERVICE_AVAILABLE:
+            try:
+                # Use real mock service
+                result = self.wifi_service.create_hotspot()
+                self.button_count += 1
+                instance.text = f"Mock: {result.get('ssid', 'Created')}"
+                print(f"Mock WiFi service result: {result}")
+            except Exception as e:
+                instance.text = f"WiFi error: {e}"
+                print(f"Mock WiFi service error: {e}")
+        else:
+            # Fallback to simulation
+            self.button_count += 1
+            ssid = f"SynergyHotspot_{self.button_count}"
+            instance.text = f"Simulated: {ssid}"
+            print(f"Simulated WiFi hotspot: {ssid}")
     
     def on_demo_color(self, instance):
         """Demo color command with protocol integration."""
@@ -215,8 +262,45 @@ class SynergyClientApp(App):
             "timestamp": self.button_count
         }
         
-        instance.text = f"Protocol: {self.current_color.title()}"
-        print(f"Sent protocol message: {color_message}")
+        # Try to use Bluetooth service for color commands
+        if self.bluetooth_service and BLUETOOTH_SERVICE_AVAILABLE:
+            try:
+                success = self.bluetooth_service.send_color_command(self.current_color)
+                instance.text = f"Bluetooth: {self.current_color.title()}"
+                print(f"Mock Bluetooth color command sent: {success}")
+            except Exception as e:
+                instance.text = f"BT Error: {e}"
+                print(f"Bluetooth color error: {e}")
+        else:
+            instance.text = f"Protocol: {self.current_color.title()}"
+            print(f"Sent protocol message: {color_message}")
+    
+    def on_demo_file_transfer(self, instance):
+        """Demo file transfer with mock services."""
+        print("Demo: File transfer with mock services")
+        Logger.info("Application: Demo file transfer with mock services")
+        
+        if self.bluetooth_service and self.file_service and BLUETOOTH_SERVICE_AVAILABLE and FILE_SERVICE_AVAILABLE:
+            try:
+                # Use real mock services
+                size_mb = PRESET_FILE_SIZES.get("medium", 25)
+                success = self.bluetooth_service.send_file_transfer_request(
+                    size_mb * 1024 * 1024,
+                    f"test_file_{size_mb}MB.bin",
+                    "android_to_windows"
+                )
+                self.button_count += 1
+                instance.text = f"Mock Transfer: {size_mb}MB"
+                print(f"Mock file transfer request: {success}")
+            except Exception as e:
+                instance.text = f"Transfer error: {e}"
+                print(f"File transfer error: {e}")
+        else:
+            # Fallback to simulation
+            self.button_count += 1
+            size_mb = PRESET_FILE_SIZES.get("medium", 25)
+            instance.text = f"Simulated: {size_mb}MB"
+            print(f"Simulated file transfer: {size_mb}MB")
     
     def on_start(self):
         """Called when app starts."""
