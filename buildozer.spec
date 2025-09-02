@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = python3,kivy==2.1.0
-requirements = python3,kivy==2.3.0,requests
+requirements = python3,kivy==2.3.0,requests,pyjnius
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

@@ -49,30 +49,55 @@ PRESET_FILE_SIZES = {
     "xlarge": 100
 }
 
-# Phase 4: Add remaining mock services incrementally
+# Phase 5: Real service integration with mock fallback
+# Try real services first, fallback to mock services
+USING_REAL_SERVICES = False
+
 try:
-    from bluetooth_service_mock import BluetoothService
+    from bluetooth_service import BluetoothService  # Real Android service
     BLUETOOTH_SERVICE_AVAILABLE = True
-    print("SUCCESS: Bluetooth mock service imported")
+    USING_REAL_SERVICES = True
+    print("SUCCESS: Real Bluetooth service imported")
 except ImportError as e:
-    BLUETOOTH_SERVICE_AVAILABLE = False
-    print(f"FALLBACK: Bluetooth service import failed ({e})")
+    try:
+        from bluetooth_service_mock import BluetoothService  # Mock fallback
+        BLUETOOTH_SERVICE_AVAILABLE = True
+        print(f"FALLBACK: Using mock Bluetooth service ({e})")
+    except ImportError as e2:
+        BLUETOOTH_SERVICE_AVAILABLE = False
+        print(f"ERROR: No Bluetooth service available ({e2})")
 
 try:
-    from wifi_hotspot_service_mock import WiFiHotspotService
+    from wifi_hotspot_service import WiFiHotspotService  # Real Android service
     WIFI_SERVICE_AVAILABLE = True
-    print("SUCCESS: WiFi mock service imported")
+    if not USING_REAL_SERVICES:
+        USING_REAL_SERVICES = True
+    print("SUCCESS: Real WiFi service imported")
 except ImportError as e:
-    WIFI_SERVICE_AVAILABLE = False
-    print(f"FALLBACK: WiFi service import failed ({e})")
+    try:
+        from wifi_hotspot_service_mock import WiFiHotspotService  # Mock fallback
+        WIFI_SERVICE_AVAILABLE = True
+        print(f"FALLBACK: Using mock WiFi service ({e})")
+    except ImportError as e2:
+        WIFI_SERVICE_AVAILABLE = False
+        print(f"ERROR: No WiFi service available ({e2})")
 
 try:
-    from file_transfer_service_mock import FileTransferService
+    from file_transfer_service import FileTransferService  # Real Android service
     FILE_SERVICE_AVAILABLE = True
-    print("SUCCESS: File transfer mock service imported")
+    if not USING_REAL_SERVICES:
+        USING_REAL_SERVICES = True
+    print("SUCCESS: Real File Transfer service imported")
 except ImportError as e:
-    FILE_SERVICE_AVAILABLE = False
-    print(f"FALLBACK: File transfer service import failed ({e})")
+    try:
+        from file_transfer_service_mock import FileTransferService  # Mock fallback
+        FILE_SERVICE_AVAILABLE = True
+        print(f"FALLBACK: Using mock File Transfer service ({e})")
+    except ImportError as e2:
+        FILE_SERVICE_AVAILABLE = False
+        print(f"ERROR: No File Transfer service available ({e2})")
+
+print(f"Service Status: {'Real Android Services' if USING_REAL_SERVICES else 'Mock Services'}")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -140,8 +165,9 @@ class SynergyClientApp(App):
             
             # Add status
             android_status = "Android APIs Available" if ANDROID_AVAILABLE else "Desktop Mode"
+            service_status = "Real Android Services" if USING_REAL_SERVICES else "Mock Services"
             status = Label(
-                text=f'Status: {android_status}\nReady for cross-platform communication\nBuilds successfully with stable foreground handling',
+                text=f'Status: {android_status}\nServices: {service_status}\nReady for cross-platform communication',
                 size_hint_y=None,
                 height=120,
                 text_size=(None, None)
