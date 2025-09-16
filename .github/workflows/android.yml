@@ -11,18 +11,24 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+    
+    - name: Set up file permissions
+      run: |
+        sudo chown -R runner:runner $GITHUB_WORKSPACE
+        chmod -R 755 $GITHUB_WORKSPACE
     
     - name: Clean problematic files
       run: |
         rm -rf .buildozer .gitmodules
     
-    - name: Build with Buildozer Action
+    - name: Build with Buildozer Action (Fixed)
       uses: ArtemSBulgakov/buildozer-action@v1
       with:
         command: buildozer android debug
         buildozer_version: master
       env:
+        USER: runner
         ANDROID_API_LEVEL: 34
         ANDROID_BUILD_TOOLS_VERSION: 34.0.0
         
@@ -31,3 +37,4 @@ jobs:
       with:
         name: android-apk
         path: bin/*.apk
+        if-no-files-found: error
