@@ -11,13 +11,13 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
     
     - name: Clean problematic files
       run: |
         rm -rf .buildozer .gitmodules
     
-    - name: Build with Buildozer Action (Permission Fix)
+    - name: Build with Buildozer Action
       uses: ArtemSBulgakov/buildozer-action@v1
       with:
         command: buildozer android debug
@@ -31,4 +31,3 @@ jobs:
       with:
         name: android-apk
         path: bin/*.apk
-        if-no-files-found: error
