@@ -146,74 +146,88 @@ class SynergyClientApp(App):
                 print(f"File service initialization error: {e}")
     
     def build(self):
-        """Build stable UI with SynergyClient branding."""
+        """Build stable UI with SynergyClient branding - Fixed layout."""
         try:
             print("Building Synergy Client UI...")
             Logger.info("Application: Building UI")
             
-            # Create main layout
-            layout = BoxLayout(orientation='vertical', padding=20, spacing=10)
+            # Create main layout with proper sizing
+            layout = BoxLayout(orientation='vertical', padding=10, spacing=5)
             
-            # Add title
+            # Add title with proper text wrapping
             title = Label(
-                text='Synergy Client\nDemo System - Stays in Foreground!',
+                text='Synergy Client',
                 size_hint_y=None,
-                height=80,
-                text_size=(None, None)
+                height=50,
+                font_size='20sp',
+                bold=True
             )
             layout.add_widget(title)
             
-            # Add status
-            android_status = "Android APIs Available" if ANDROID_AVAILABLE else "Desktop Mode"
-            service_status = "Real Android Services" if USING_REAL_SERVICES else "Mock Services"
+            # Add status with proper wrapping and sizing
+            android_status = "Android" if ANDROID_AVAILABLE else "Desktop"
+            service_status = "Real Services" if USING_REAL_SERVICES else "Mock Services"
             status = Label(
-                text=f'Status: {android_status}\nServices: {service_status}\nReady for cross-platform communication',
+                text=f'{android_status} | {service_status}',
                 size_hint_y=None,
-                height=120,
-                text_size=(None, None)
+                height=40,
+                font_size='14sp'
             )
             layout.add_widget(status)
             
-            # Add demo button
+            # Add demo buttons with consistent sizing
             demo_button = Button(
-                text='Demo: Simulate Bluetooth Scan',
+                text='Bluetooth Scan',
                 size_hint_y=None,
-                height=60
+                height=50,
+                font_size='16sp'
             )
             demo_button.bind(on_press=self.on_demo_bluetooth)
             layout.add_widget(demo_button)
             
-            # Add demo WiFi button
             wifi_button = Button(
-                text='Demo: Simulate WiFi Hotspot',
+                text='WiFi Hotspot',
                 size_hint_y=None,
-                height=60
+                height=50,
+                font_size='16sp'
             )
             wifi_button.bind(on_press=self.on_demo_wifi)
             layout.add_widget(wifi_button)
             
-            # Add color demo
             color_button = Button(
-                text='Demo: Send Color Command',
+                text='Send Color',
                 size_hint_y=None,
-                height=60
+                height=50,
+                font_size='16sp'
             )
             color_button.bind(on_press=self.on_demo_color)
             layout.add_widget(color_button)
             
-            # Add file transfer button
             file_button = Button(
-                text='Demo: File Transfer (25MB)',
+                text='File Transfer',
                 size_hint_y=None,
-                height=60
+                height=50,
+                font_size='16sp'
             )
             file_button.bind(on_press=self.on_demo_file_transfer)
             layout.add_widget(file_button)
             
-            # Add info
+            # Add debug button to show service status
+            debug_button = Button(
+                text='Show Debug Info',
+                size_hint_y=None,
+                height=50,
+                font_size='16sp'
+            )
+            debug_button.bind(on_press=self.on_debug_info)
+            layout.add_widget(debug_button)
+            
+            # Add compact info
             info = Label(
-                text='All SynergyClient functions with mock services.\nStable foreground operation maintained.\nReady for cross-platform testing.',
-                text_size=(None, None)
+                text='All functions enabled',
+                size_hint_y=None,
+                height=30,
+                font_size='12sp'
             )
             layout.add_widget(info)
             
@@ -226,7 +240,7 @@ class SynergyClientApp(App):
             Logger.error(f"Application: Error building UI: {str(e)}")
             
             # Emergency fallback
-            return Label(text=f'Error: {str(e)}')
+            return Label(text=f'Error: {str(e)}', text_size=(300, None))
     
     def on_demo_bluetooth(self, instance):
         """Demo Bluetooth functionality with real mock service."""
@@ -327,6 +341,31 @@ class SynergyClientApp(App):
             size_mb = PRESET_FILE_SIZES.get("medium", 25)
             instance.text = f"Simulated: {size_mb}MB"
             print(f"Simulated file transfer: {size_mb}MB")
+    
+    def on_debug_info(self, instance):
+        """Show debug information about services."""
+        print("=== DEBUG INFO ===")
+        debug_info = []
+        debug_info.append(f"Android APIs: {ANDROID_AVAILABLE}")
+        debug_info.append(f"Real Services: {USING_REAL_SERVICES}")
+        debug_info.append(f"Bluetooth Available: {BLUETOOTH_SERVICE_AVAILABLE}")
+        debug_info.append(f"WiFi Available: {WIFI_SERVICE_AVAILABLE}")
+        debug_info.append(f"File Available: {FILE_SERVICE_AVAILABLE}")
+        
+        # Try to get more detailed info
+        if self.bluetooth_service:
+            try:
+                bt_enabled = self.bluetooth_service.is_bluetooth_enabled()
+                debug_info.append(f"BT Enabled: {bt_enabled}")
+            except Exception as e:
+                debug_info.append(f"BT Error: {str(e)[:30]}")
+        
+        debug_text = " | ".join(debug_info)
+        instance.text = debug_text[:50] + "..." if len(debug_text) > 50 else debug_text
+        
+        # Print full debug info
+        for info in debug_info:
+            print(f"DEBUG: {info}")
     
     def on_start(self):
         """Called when app starts."""
