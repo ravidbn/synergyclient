@@ -71,6 +71,9 @@ chmod +x fix_build_environment.sh build_android_venv.sh
 - **`build_with_pipx.sh`** - Alternative using pipx for tool isolation
 - **`build_with_docker.sh`** - Uses Docker containers (fixed for compatibility issues)
 - **`fix_distutils.sh`** - Fixes "No module named 'distutils'" error (Python 3.12+)
+- **`fix_java_gradle.sh`** - Fixes Java/Gradle compatibility errors
+- **`fix_gradle_java_final.sh`** - Comprehensive fix for persistent Java/Gradle issues
+- **`fix_java17_final.sh`** - FINAL FIX: Installs Java 17 (required by Android Gradle Plugin)
 - **`test_environment.sh`** - Checks what's available on your system
 
 ## Expected Results
@@ -95,12 +98,16 @@ adb install bin/*.apk
 
 ## Quick Fixes
 
-### For the core error only (fastest):
+### For the complete solution (all errors fixed):
 ```bash
-chmod +x fix_simple.sh && ./fix_simple.sh && source buildenv/bin/activate && buildozer android debug
+# Complete fix including Java 17 requirement:
+chmod +x fix_simple.sh fix_distutils.sh fix_java17_final.sh
+./fix_simple.sh && ./fix_distutils.sh && ./fix_java17_final.sh
+source buildenv/bin/activate
+buildozer android debug
 ```
 
-### For automatic detection and full setup:
+### For automatic detection and setup:
 ```bash
 chmod +x build_apk.sh && ./build_apk.sh
 ```
@@ -110,8 +117,23 @@ chmod +x build_apk.sh && ./build_apk.sh
 chmod +x fix_distutils.sh && ./fix_distutils.sh
 ```
 
+### If you get "Android Gradle plugin requires Java 17" error:
+```bash
+# FINAL FIX - Android Gradle Plugin requires Java 17:
+chmod +x fix_java17_final.sh && ./fix_java17_final.sh
+```
+
+### If you get other Java/Gradle compatibility errors:
+```bash
+# Try the comprehensive fix first:
+chmod +x fix_gradle_java_final.sh && ./fix_gradle_java_final.sh
+
+# Or use the basic fix:
+chmod +x fix_java_gradle.sh && ./fix_java_gradle.sh
+```
+
 ### If you get libtinfo5 package errors:
 Use the simple fix above, then install dependencies manually:
 ```bash
-sudo apt install -y git zip unzip openjdk-8-jdk cmake build-essential python3-dev python3-setuptools
+sudo apt install -y git zip unzip openjdk-11-jdk cmake build-essential python3-dev python3-setuptools
 ```

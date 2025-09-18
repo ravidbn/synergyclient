@@ -22,7 +22,7 @@ fi
 export BUILDOZER_WARN_ON_ROOT=1
 export ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
 export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 
 # Create android home directory
 mkdir -p $ANDROID_HOME
