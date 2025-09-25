@@ -1,20 +1,15 @@
 [app]
-title = Synergy Client v3.0
+title = Synergy Client
 package.name = synergyclient
 package.domain = org.synergy
 source.dir = .
-version = 3.0
-
-# SINGLE FILE APPROACH - Only main.py needed
-source.include_exts = py
-# NO exclusions that could cause conflicts
-source.exclude_dirs = tests,bin,venv,buildenv,.buildozer,.git,.github,__pycache__
-
-requirements = python3,kivy==2.3.0
+source.include_exts = py,kv
+version = 0.1
+requirements = python3,kivy==2.3.0,requests,pyjnius
 orientation = portrait
 fullscreen = 0
 
-# Essential Android settings
+# Android specific - ESSENTIAL settings from working config
 android.api = 33
 android.minapi = 23
 android.sdk = 33
@@ -27,8 +22,8 @@ android.add_compile_options = "sourceCompatibility = JavaVersion.VERSION_17", "t
 android.archs = arm64-v8a
 android.allow_backup = True
 
-# Minimal permissions
-android.permissions = BLUETOOTH,ACCESS_FINE_LOCATION,ACCESS_WIFI_STATE,INTERNET
+# Essential permissions
+android.permissions = BLUETOOTH,BLUETOOTH_ADMIN,ACCESS_FINE_LOCATION,ACCESS_WIFI_STATE,CHANGE_WIFI_STATE,INTERNET
 
 [buildozer]
 log_level = 2
